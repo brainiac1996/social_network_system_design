@@ -1,0 +1,535 @@
+openapi: 3.0.3
+info:
+  title: API для социальной сети ВКонтакте - OpenAPI 3.0
+  description: |-
+    REST API для социальной сети ВКонтакте со следующими операциями:
+    - добавление и удаление друзей;
+    - просмотр друзей пользователя;
+    - просмотр анкеты пользователя;
+    - публикация поста в ленту;
+    - загрузка медиа файлов для постов;
+    - просмотр ленты постов (*домашней и пользователей)*;
+    - просмотр диалогов и чатов пользователя;
+    - отправка и чтение сообщений в диалогах и чатах.
+  version: 1.0.11
+servers:
+  - url: https://petstore3.swagger.io/api/v3
+tags:
+  - name: user
+    description: Operations about user
+  - name: chat
+    description: Show user's chats
+  - name: media
+    description: Upload media for posts
+  - name: feed
+    description: Operations about feed
+paths:
+  # User
+  /users/{user_id}/profile:
+    get:
+      tags:
+        - user
+      summary: Get user's profile
+      description: "Get user's profile"
+      operationId: getProfile
+      parameters:
+        - name: user_id
+          in: path
+          description: 'User ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
+  /users/{user_id}/friends:
+    get:
+      tags:
+        - user
+      summary: Show user's friends
+      description: "Show user's friends"
+      operationId: getFriends
+      parameters:
+        - name: user_id
+          in: path
+          description: 'User ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
+  /users/{user_id}/friends/{friend_id}:
+    post:
+      tags:
+        - user
+      summary: Send friend request
+      description: 'Send friend request'
+      operationId: addFriend
+      parameters:
+        - name: user_id
+          in: path
+          description: 'User ID'
+          required: true
+          schema:
+            type: integer
+        - name: friend_id
+          in: path
+          description: 'Friend ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
+    delete:
+      tags:
+        - user
+      summary: Delete user from friends
+      description: 'Delete user from friends'
+      operationId: deleteFriend
+      parameters:
+        - name: user_id
+          in: path
+          description: 'User ID'
+          required: true
+          schema:
+            type: integer
+        - name: friend_id
+          in: path
+          description: 'Friend ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
+  # Chat
+  /chats:
+    get:
+      tags:
+        - chat
+      summary: Get chats previews
+      description: 'Get chats previews'
+      operationId: getChats
+      parameters:
+        - name: user_id
+          description: 'User ID'
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chat'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
+  /chats/{chat_id}:
+    get:
+      tags:
+        - chat
+      summary: Get chat by chat_id
+      description: 'Get chat by chat_id'
+      operationId: getChat
+      parameters:
+        - name: chat_id
+          in: path
+          description: 'Chat ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Chat not found
+        '500':
+          description: Internal Server Error
+  /chats/{chat_id}/messages:
+    post:
+      tags:
+        - chat
+      summary: Send a new message in a chat
+      description: 'Send a new message in a chat'
+      operationId: sendMessageInChat
+      parameters:
+        - name: chat_id
+          in: path
+          description: 'Chat ID'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Request body
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - text
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Chat not found
+        '500':
+          description: Internal Server Error
+  # Media
+  /media/images:
+    post:
+      tags:
+        - media
+      summary: Upload post image
+      description: 'Upload post image'
+      operationId: uploadImageForPost
+      requestBody:
+        description: Request body
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fileName:
+                  type: string
+                body:
+                  type: string
+                orderingNumber:
+                  type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostImage'
+        '500':
+          description: Internal Server Error
+  # Feed
+  /feeds/{feed_id}/posts:
+    get:
+      tags:
+        - feed
+      summary: Get post in feed
+      description: 'Get post in feed'
+      operationId: getPostInFeed
+      parameters:
+        - name: feed_id
+          in: path
+          description: 'Feed ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  feed:
+                    $ref: '#/components/schemas/Feed'
+                  posts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Post'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Feed not found
+        '500':
+          description: Internal Server Error
+    post:
+      tags:
+        - feed
+      summary: Create new post in feed
+      description: 'Create new post in feed'
+      operationId: createPostInFeed
+      parameters:
+        - name: feed_id
+          in: path
+          description: 'Feed ID'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Request body
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                imageId:
+                  type: array
+                  items:
+                    type: string
+                restriction:
+                  type: string
+                  default: PUBLIC
+                  enum:
+                    - ONLYFRIENDS
+                    - PUBLIC
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  feed:
+                    $ref: '#/components/schemas/Feed'
+                  post:
+                    $ref: '#/components/schemas/Post'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Feed not found
+        '500':
+          description: Internal Server Error
+  /feeds/{feed_id}/posts/{post_id}:
+    get:
+      tags:
+        - feed
+      summary: Get post in feed
+      description: 'Get post in feed'
+      operationId: getPostInFeed
+      parameters:
+        - name: feed_id
+          in: path
+          description: 'Feed ID'
+          required: true
+          schema:
+            type: integer
+        - name: post_id
+          in: path
+          description: 'Post ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  feed:
+                    $ref: '#/components/schemas/Feed'
+                  post:
+                    $ref: '#/components/schemas/Post'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Feed/Post not found
+        '500':
+          description: Internal Server Error
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        userName:
+          type: string
+          example: theUser
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: James
+        email:
+          type: string
+          example: john@email.com
+        phone:
+          type: string
+          example: '12345'
+        avatarUrl:
+          type: string
+          example: https://static5.tgstat.ru/channels/_0/3a/3a2e6b00ff573069c64413558ee984e5.jpg
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        userId:
+          type: integer
+          format: int64
+          example: 10
+        createdDate:
+          type: string
+          format: date-time
+          example: "2023-12-01T09:12:28Z"
+        text:
+          type: string
+        isRead:
+          type: boolean
+          example: true
+    Chat:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        name:
+          type: string
+          example: "ChatName"
+        updatedDate:
+          type: string
+          format: date-time
+          example: "2023-12-01T09:12:28Z"
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+    Feed:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        userId:
+          type: integer
+          format: int64
+          example: 10
+        createdDate:
+          type: string
+          format: date-time
+          example: "2023-12-01T09:12:28Z"
+        updatedDate:
+          type: string
+          format: date-time
+          example: "2023-12-01T09:12:28Z"
+        deletedDate:
+          type: string
+          format: date-time
+          example: "2023-12-01T09:12:28Z"
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        feedId:
+          type: integer
+          format: int64
+          example: 10
+        createdDate:
+          type: string
+          format: date-time
+          example: "2023-12-01T09:12:28Z"
+        updatedDate:
+          type: string
+          format: date-time
+          example: "2023-12-01T09:12:28Z"
+        deletedDate:
+          type: string
+          format: date-time
+          example: "2023-12-01T09:12:28Z"
+        text:
+          type: string
+        author:
+          $ref: '#/components/schemas/User'
+        likesCount:
+          type: integer
+          example: 20
+        repostsCount:
+          type: integer
+          example: 20
+        commentsCount:
+          type: integer
+          example: 20
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostImage'
+    PostImage:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        smallUrl:
+          type: string
+        mediumUrl:
+          type: string
+        largeUrl:
+          type: string
+        orderingNumber:
+          type: integer
