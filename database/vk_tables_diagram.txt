@@ -1,0 +1,130 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+
+Table user {
+  id integer [primary key]
+  user_name varchar
+  first_name varchar
+  last_name varchar
+  email varchar
+  phone varchar
+  avatar_url varchar
+  description varchar
+  interest varchar
+  city_id integer
+}
+
+Table city {
+  id integer [primary key]
+  name varchar
+  address varchar
+  postcode varchar
+}
+
+Table message {
+  id integer [primary key]
+  text varchar
+  is_read boolean
+  created_date varchar
+  user_id integer
+}
+
+Table chat {
+  id integer [primary key]
+  name varchar
+}
+
+Table chat_user_junction {
+  user_id integer
+  chat_id integer
+}
+
+Table chat_message_junction {
+  chat_id integer
+  message_id integer
+}
+
+Table friend_message_junction {
+  message_id integer
+  sending_user_id integer
+  receiving_user_id integer
+}
+
+Table post {
+  id integer [primary key]
+  text varchar
+  likes_count integer
+  views_count integer
+}
+
+Table media {
+  id integer [primary key]
+  body text
+  small_url varchar
+  medium_url varchar
+  large_url varchar
+  post_id integer
+}
+
+Table comment {
+  id integer [primary key]
+  text varchar
+  user_id integer
+  post_id integer
+}
+
+Table hashtag {
+  id integer [primary key]
+  name varchar
+}
+
+Table post_hashtag_junction {
+  post_id integer
+  hashtag_id integer
+}
+
+Table relation {
+  id integer [primary key]
+  type integer [note: 'друзья - 1, любовные отношения - 2, подписчики - 3']
+}
+
+Table user_relation_junction {
+  current_user_id integer
+  relationship_user_id integer
+  relation_id integer
+}
+
+Ref: user.city_id > city.id
+
+Ref: message.user_id > user.id
+
+Ref: chat_user_junction.user_id > user.id
+
+Ref: chat_user_junction.chat_id > chat.id
+
+Ref: chat_message_junction.message_id > message.id
+
+Ref: chat_message_junction.chat_id > chat.id
+
+Ref: friend_message_junction.message_id > message.id
+
+Ref: friend_message_junction.sending_user_id > user.id
+
+Ref: friend_message_junction.receiving_user_id > user.id
+
+Ref: media.post_id > post.id
+
+Ref: post_hashtag_junction.post_id > post.id
+
+Ref: post_hashtag_junction.hashtag_id > hashtag.id
+
+Ref: comment.post_id > post.id
+
+Ref: comment.user_id > user.id
+
+Ref: user_relation_junction.current_user_id > user.id
+
+Ref: user_relation_junction.relationship_user_id > user.id
+
+Ref: user_relation_junction.relation_id > relation.id
