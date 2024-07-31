@@ -15,376 +15,281 @@ info:
 servers:
   - url: https://petstore3.swagger.io/api/v3
 tags:
-  - name: user
-    description: Operations about user
-  - name: chat
-    description: Show user's chats
-  - name: media
-    description: Upload media for posts
-  - name: feed
-    description: Operations about feed
+  - name: Friends
+    description: Операции с друзьями
+  - name: Users
+    description: Операции с пользователями
+  - name: Posts
+    description: Операции с постами
+  - name: Media
+    description: Операции с медиа файлами
+  - name: Feed
+    description: Операции с лентой постов
+  - name: Dialogs
+    description: Операции с диалогами и чатами
+  - name: Messages
+    description: Операции с сообщениями
+
 paths:
-  # User
-  /users/{user_id}/profile:
-    get:
+  /users/{userId}/friends:
+    post:
       tags:
-        - user
-      summary: Get user's profile
-      description: "Get user's profile"
-      operationId: getProfile
+        - Friends
+      summary: Добавление друга
       parameters:
-        - name: user_id
+        - name: userId
           in: path
-          description: 'User ID'
           required: true
           schema:
             type: integer
+            format: int64
+            example: 12345
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                friendId:
+                  type: integer
+                  format: int64
+                  example: 67890
       responses:
         '200':
-          description: OK
+          description: Друг успешно добавлен
+
+    get:
+      tags:
+        - Friends
+      summary: Просмотр друзей пользователя
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      responses:
+        '200':
+          description: Список друзей пользователя
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Friend'
+
+  /users/{userId}/friends/{friendId}:
+    delete:
+      tags:
+        - Friends
+      summary: Удаление друга
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+        - name: friendId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 67890
+      responses:
+        '200':
+          description: Друг успешно удален
+
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Просмотр анкеты пользователя
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      responses:
+        '200':
+          description: Анкета пользователя
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-        '400':
-          description: Invalid ID supplied
-        '404':
-          description: User not found
-        '500':
-          description: Internal Server Error
-  /users/{user_id}/friends:
-    get:
-      tags:
-        - user
-      summary: Show user's friends
-      description: "Show user's friends"
-      operationId: getFriends
-      parameters:
-        - name: user_id
-          in: path
-          description: 'User ID'
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
-        '400':
-          description: Invalid ID supplied
-        '404':
-          description: User not found
-        '500':
-          description: Internal Server Error
-  /users/{user_id}/friends/{friend_id}:
+
+  /users/{userId}/posts:
     post:
       tags:
-        - user
-      summary: Send friend request
-      description: 'Send friend request'
-      operationId: addFriend
+        - Posts
+      summary: Публикация поста в ленту
       parameters:
-        - name: user_id
+        - name: userId
           in: path
-          description: 'User ID'
           required: true
           schema:
             type: integer
-        - name: friend_id
-          in: path
-          description: 'Friend ID'
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Invalid ID supplied
-        '404':
-          description: User not found
-        '500':
-          description: Internal Server Error
-    delete:
-      tags:
-        - user
-      summary: Delete user from friends
-      description: 'Delete user from friends'
-      operationId: deleteFriend
-      parameters:
-        - name: user_id
-          in: path
-          description: 'User ID'
-          required: true
-          schema:
-            type: integer
-        - name: friend_id
-          in: path
-          description: 'Friend ID'
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Invalid ID supplied
-        '404':
-          description: User not found
-        '500':
-          description: Internal Server Error
-  # Chat
-  /chats:
-    get:
-      tags:
-        - chat
-      summary: Get chats previews
-      description: 'Get chats previews'
-      operationId: getChats
-      parameters:
-        - name: user_id
-          description: 'User ID'
-          in: query
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Chat'
-        '400':
-          description: Invalid ID supplied
-        '404':
-          description: User not found
-        '500':
-          description: Internal Server Error
-  /chats/{chat_id}:
-    get:
-      tags:
-        - chat
-      summary: Get chat by chat_id
-      description: 'Get chat by chat_id'
-      operationId: getChat
-      parameters:
-        - name: chat_id
-          in: path
-          description: 'Chat ID'
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Chat'
-        '400':
-          description: Invalid ID supplied
-        '404':
-          description: Chat not found
-        '500':
-          description: Internal Server Error
-  /chats/{chat_id}/messages:
-    post:
-      tags:
-        - chat
-      summary: Send a new message in a chat
-      description: 'Send a new message in a chat'
-      operationId: sendMessageInChat
-      parameters:
-        - name: chat_id
-          in: path
-          description: 'Chat ID'
-          required: true
-          schema:
-            type: integer
+            format: int64
+            example: 12345
       requestBody:
-        description: Request body
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - text
-              properties:
-                text:
-                  type: string
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Invalid ID supplied
-        '404':
-          description: Chat not found
-        '500':
-          description: Internal Server Error
-  # Media
-  /media/images:
-    post:
-      tags:
-        - media
-      summary: Upload post image
-      description: 'Upload post image'
-      operationId: uploadImageForPost
-      requestBody:
-        description: Request body
         required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                fileName:
+                content:
                   type: string
-                body:
-                  type: string
-                orderingNumber:
-                  type: integer
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PostImage'
-        '500':
-          description: Internal Server Error
-  # Feed
-  /feeds/{feed_id}/posts:
-    get:
-      tags:
-        - feed
-      summary: Get post in feed
-      description: 'Get post in feed'
-      operationId: getPostInFeed
-      parameters:
-        - name: feed_id
-          in: path
-          description: 'Feed ID'
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  feed:
-                    $ref: '#/components/schemas/Feed'
-                  posts:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Post'
-        '400':
-          description: Invalid ID supplied
-        '404':
-          description: Feed not found
-        '500':
-          description: Internal Server Error
-    post:
-      tags:
-        - feed
-      summary: Create new post in feed
-      description: 'Create new post in feed'
-      operationId: createPostInFeed
-      parameters:
-        - name: feed_id
-          in: path
-          description: 'Feed ID'
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        description: Request body
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                text:
-                  type: string
-                imageId:
+                  example: "Привет, мир!"
+                media:
                   type: array
                   items:
-                    type: string
-                restriction:
-                  type: string
-                  default: PUBLIC
-                  enum:
-                    - ONLYFRIENDS
-                    - PUBLIC
+                    type: integer
+                    format: int64
+                    example: [1, 2]
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  feed:
-                    $ref: '#/components/schemas/Feed'
-                  post:
-                    $ref: '#/components/schemas/Post'
-        '400':
-          description: Invalid ID supplied
-        '404':
-          description: Feed not found
-        '500':
-          description: Internal Server Error
-  /feeds/{feed_id}/posts/{post_id}:
+          description: Пост успешно опубликован
+
     get:
       tags:
-        - feed
-      summary: Get post in feed
-      description: 'Get post in feed'
-      operationId: getPostInFeed
+        - Posts
+      summary: Просмотр ленты постов пользователя
       parameters:
-        - name: feed_id
+        - name: userId
           in: path
-          description: 'Feed ID'
           required: true
           schema:
             type: integer
-        - name: post_id
-          in: path
-          description: 'Post ID'
-          required: true
-          schema:
-            type: integer
+            format: int64
+            example: 12345
       responses:
         '200':
-          description: OK
+          description: Лента постов пользователя
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  feed:
-                    $ref: '#/components/schemas/Feed'
-                  post:
-                    $ref: '#/components/schemas/Post'
-        '400':
-          description: Invalid ID supplied
-        '404':
-          description: Feed/Post not found
-        '500':
-          description: Internal Server Error
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+
+  /media:
+    post:
+      tags:
+        - Media
+      summary: Загрузка медиа файлов для постов
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Медиа файл успешно загружен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Media'
+
+  /feed:
+    get:
+      tags:
+        - Feed
+      summary: Просмотр домашней ленты постов
+      responses:
+        '200':
+          description: Домашняя лента постов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+
+  /users/{userId}/dialogs:
+    get:
+      tags:
+        - Dialogs
+      summary: Просмотр диалогов и чатов пользователя
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      responses:
+        '200':
+          description: Список диалогов и чатов пользователя
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dialog'
+
+  /dialogs/{dialogId}/messages:
+    post:
+      tags:
+        - Messages
+      summary: Отправка сообщения в диалог или чат
+      parameters:
+        - name: dialogId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  example: "Привет!"
+      responses:
+        '200':
+          description: Сообщение успешно отправлено
+
+    get:
+      tags:
+        - Messages
+      summary: Чтение сообщений из диалога или чата
+      parameters:
+        - name: dialogId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1
+      responses:
+        '200':
+          description: Сообщения из диалога или чата
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
 
 components:
   schemas:
@@ -394,142 +299,187 @@ components:
         id:
           type: integer
           format: int64
-          example: 10
-        userName:
-          type: string
-          example: theUser
-        firstName:
-          type: string
-          example: John
-        lastName:
-          type: string
-          example: James
-        email:
-          type: string
-          example: john@email.com
-        phone:
-          type: string
-          example: '12345'
-        avatarUrl:
-          type: string
-          example: https://static5.tgstat.ru/channels/_0/3a/3a2e6b00ff573069c64413558ee984e5.jpg
-    Message:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 10
-        userId:
-          type: integer
-          format: int64
-          example: 10
-        createdDate:
-          type: string
-          format: date-time
-          example: "2023-12-01T09:12:28Z"
-        text:
-          type: string
-        isRead:
-          type: boolean
-          example: true
-    Chat:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 10
+          example: 12345
         name:
           type: string
-          example: "ChatName"
-        updatedDate:
+          example: "Иван"
+        surname:
           type: string
-          format: date-time
-          example: "2023-12-01T09:12:28Z"
-        users:
+          example: "Иванов"
+        birthdate:
+          type: string
+          format: date
+          example: "1990-01-01"
+        city:
+          type: string
+          example: "Москва"
+        status:
+          type: string
+          example: "В поиске работы"
+        profile_photo:
+          type: string
+          example: "https://example.com/profile.jpg"
+        friends:
           type: array
           items:
-            $ref: '#/components/schemas/User'
-        messages:
+            type: integer
+            format: int64
+            example: [67890, 24680]
+        posts:
           type: array
           items:
-            $ref: '#/components/schemas/Message'
-    Feed:
+            type: integer
+            format: int64
+            example: [101, 102]
+        dialogs:
+          type: array
+          items:
+            type: integer
+            format: int64
+            example: [201, 202]
+
+    Friend:
       type: object
       properties:
         id:
           type: integer
           format: int64
-          example: 10
-        userId:
-          type: integer
-          format: int64
-          example: 10
-        createdDate:
+          example: 67890
+        name:
           type: string
-          format: date-time
-          example: "2023-12-01T09:12:28Z"
-        updatedDate:
+          example: "Петр"
+        surname:
           type: string
-          format: date-time
-          example: "2023-12-01T09:12:28Z"
-        deletedDate:
+          example: "Петров"
+        birthdate:
           type: string
-          format: date-time
-          example: "2023-12-01T09:12:28Z"
+          format: date
+          example: "1992-02-02"
+        city:
+          type: string
+          example: "Санкт-Петербург"
+        status:
+          type: string
+          example: "Студент"
+        profile_photo:
+          type: string
+          example: "https://example.com/friend_profile.jpg"
+
     Post:
       type: object
       properties:
         id:
           type: integer
           format: int64
-          example: 10
-        feedId:
+          example: 101
+        author:
           type: integer
           format: int64
-          example: 10
-        createdDate:
+          example: 12345
+        content:
           type: string
-          format: date-time
-          example: "2023-12-01T09:12:28Z"
-        updatedDate:
-          type: string
-          format: date-time
-          example: "2023-12-01T09:12:28Z"
-        deletedDate:
-          type: string
-          format: date-time
-          example: "2023-12-01T09:12:28Z"
-        text:
-          type: string
-        author:
-          $ref: '#/components/schemas/User'
-        likesCount:
-          type: integer
-          example: 20
-        repostsCount:
-          type: integer
-          example: 20
-        commentsCount:
-          type: integer
-          example: 20
-        images:
+          example: "Привет, мир!"
+        media:
           type: array
           items:
-            $ref: '#/components/schemas/PostImage'
-    PostImage:
+            $ref: '#/components/schemas/Media'
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-10-01T12:00:00Z"
+        likes:
+          type: integer
+          example: 5
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+
+    Media:
       type: object
       properties:
         id:
           type: integer
           format: int64
-          example: 10
-        smallUrl:
+          example: 1
+        type:
           type: string
-        mediumUrl:
+          example: "image"
+        url:
           type: string
-        largeUrl:
-          type: string
-        orderingNumber:
+          example: "https://example.com/image.jpg"
+        size:
           type: integer
+          example: 1024
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-10-01T12:00:00Z"
+
+    Dialog:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        type:
+          type: string
+          example: "dialog"
+        participants:
+          type: array
+          items:
+            type: integer
+            format: int64
+            example: [12345, 67890]
+        messages:
+          type: array
+          items:
+            type: integer
+            format: int64
+            example: [401, 402]
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 401
+        author:
+          type: integer
+          format: int64
+          example: 12345
+        content:
+          type: string
+          example: "Привет!"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-10-01T12:00:00Z"
+        read:
+          type: boolean
+          example: true
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 301
+        author:
+          type: integer
+          format: int64
+          example: 12345
+        content:
+          type: string
+          example: "Отличный пост!"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-10-01T12:00:00Z"
+        post:
+          type: integer
+          format: int64
+          example: 101
